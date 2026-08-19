@@ -1,43 +1,89 @@
-# **F1 Race Strategy Predictor**
+# F1 Race Strategy Predictor
 
-## **A Reinforcement Learning-Based Multi-Agent Formula 1 Race Strategy Simulation System**
+> **An AI-powered Formula 1 Race Strategy Prediction System using Reinforcement Learning and real F1 data.**
 
-A clean, standalone project that uses real Formula 1 historical data from FastF1 and Reinforcement Learning to learn race strategy decisions.
+**Status: In Development**
 
-## Project Structure and Purpose
+## About
 
-- `data/`: Stores the project datasets.
-  - `raw/`: Raw data extracted from FastF1.
-  - `processed/`: Processed lap-level datasets, ready for ML training.
-  - `models/`: Fitted tire degradation models and saved RL models.
-- `cache/fastf1/`: Dedicated directory for caching FastF1 API responses to avoid rate limits and improve speed.
-- `outputs/`: All generated artifacts are saved here to avoid cluttering the repository.
-  - `plots/`: Visualizations for tire degradation (`degradation/`) and RL training progress (`training/`).
-  - `evaluations/`: Results and metrics from evaluating trained agents.
-  - `simulations/`: Race replays, GIFs, and strategy plots from the simulator.
-  - `reports/`: Text summaries or CSV logs of race results.
-- `logs/tensorboard/`: TensorBoard logs for monitoring Stable-Baselines3 PPO training.
-- `src/`: The core source code for the project.
-  - `data/`: Scripts for loading FastF1 data, extracting lap/weather features, and building datasets.
-  - `models/`: Mathematical models for tire degradation and lap time estimation.
-  - `environment/`: The core race simulator and the Gymnasium environment for RL.
-  - `agents/`: PPO Agent definitions and custom RL callbacks.
-  - `training/`: Scripts to launch and configure PPO training.
-  - `evaluation/`: Scripts to run evaluation races and evaluate baselines.
-  - `visualization/`: Matplotlib plotting utilities for race replays and strategy visualization.
-- `scripts/`: High-level entry points for downloading data, fitting models, training, evaluating, and simulating races.
-- `tests/`: Unit tests (pytest) to validate data pipelines, degradation models, simulator logic, and environment constraints.
+The **F1 Race Strategy Predictor** is a Reinforcement Learning project that aims to train AI agents to make strategic decisions during an F1 race.
 
-## Real Data vs Simulation Assumptions
+The system will use **real historical Formula 1 data from FastF1** to model factors such as tire degradation, lap times, pit stops, and race conditions.
 
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| **Lap Times** | REAL DATA | Base pace derived directly from FastF1 historical laps. |
-| **Tire Compounds** | REAL DATA | Historical compounds used by drivers. |
-| **Tire Degradation** | MODEL ESTIMATE | Extracted and modeled from historical tire life vs lap time delta. |
-| **Pit Stop Stationary Time** | REAL DATA | Based on real historical pit stop durations. |
-| **Pit Lane Loss** | MODEL ESTIMATE | Modeled transit time based on average pit lane speed limits. |
-| **Safety Car Frequency** | SIMULATION ASSUMPTION | Configurable probabilities for SC/VSC per lap. |
-| **SC/VSC Duration** | SIMULATION ASSUMPTION | Configurable min/max duration ranges. |
-| **Traffic Effect** | SIMULATION ASSUMPTION | Modeled time penalty when following closely, as aerodynamic dirty air is hard to perfectly extract. |
-| **Fuel Effect** | SIMULATION ASSUMPTION | Assumed linear time penalty per lap of fuel burned (e.g., ~0.05s per kg). |
+The AI will then learn through simulated races when to pit and which tire compound to choose.
+
+## Main Goal
+
+The agent will make decisions such as:
+
+* Stay out or pit
+* Choose Soft, Medium, or Hard tires
+* React to Safety Car / VSC periods
+* Attempt undercuts or overcuts
+* Optimize overall race position
+
+The goal is to learn strategies through **Reinforcement Learning rather than manually programming fixed strategies**.
+
+## Technologies
+
+* **Python**
+* **FastF1** — F1 historical data & telemetry
+* **Gymnasium** — race simulation environment
+* **Stable-Baselines3 / PPO** — Reinforcement Learning
+* **NumPy / pandas** — data processing
+* **Scikit-learn** — statistical modeling
+* **Matplotlib** — visualization
+* **PyTorch** — ML backend
+
+## Basic Architecture
+
+```text
+Real F1 Data (FastF1)
+        ↓
+Data Processing
+        ↓
+Tire Degradation & Lap-Time Models
+        ↓
+F1 Race Simulator
+        ↓
+RL Environment
+        ↓
+PPO Agents
+        ↓
+Race Strategy Decisions
+        ↓
+Evaluation & Visualization
+```
+
+## What I Want to Build
+
+The final system should be able to simulate an F1 race with multiple AI-controlled cars and learn strategies based on:
+
+* Tire age and degradation
+* Track position
+* Gaps to other cars
+* Pit-stop timing
+* Safety Car / VSC conditions
+* Tire compound selection
+
+The trained agents will then be evaluated against simple rule-based strategies and historical F1 strategies.
+
+## Project Status
+
+Currently building the project from scratch.
+
+**Planned:**
+
+* FastF1 data pipeline
+* Tire degradation model
+* Race simulator
+* RL environment
+* PPO training
+* Strategy evaluation
+* Race visualization
+
+## Note
+
+This is an **Educational / Research Simulation**, not an attempt to reproduce the complete physics or strategy systems used by real F1 teams.
+
+The project focuses specifically on exploring **Reinforcement Learning for Race Strategy Optimization**.
