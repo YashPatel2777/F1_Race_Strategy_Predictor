@@ -1,0 +1,37 @@
+# F1 Race Strategy Predictor - Configuration
+
+data:
+  circuit: "Silverstone"
+  seasons:
+    - 2022
+    - 2023
+    - 2024
+
+simulation:
+  num_cars: 5
+  total_laps: 52
+  fuel_effect: 0.05       # Lap time penalty (seconds) per kg of fuel
+  traffic_effect: 0.2     # Lap time penalty when closely following another car
+  pit_loss_stationary: 2.5 # Stationary time in seconds
+  pit_loss_transit: 20.0   # Pit lane transit time in seconds
+
+safety_car:
+  enabled: true
+  probability_per_lap: 0.10
+  min_duration: 3
+  max_duration: 5
+
+vsc:
+  enabled: true
+  probability_per_lap: 0.08
+  min_duration: 2
+  max_duration: 4
+
+training:
+  algorithm: "PPO"
+  total_timesteps: 500000
+  learning_rate: 0.0003
+  batch_size: 64
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
