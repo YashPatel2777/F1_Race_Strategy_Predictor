@@ -158,10 +158,13 @@ class F1StrategyEnv(gym.Env):
             
         # 3. Final Race Result
         if self.simulator.state.lap_progress > self.simulator.total_laps:
-            # Reward formula: P1 gets +20, P5 gets -20
-            # (assuming 5 cars: 5 - 1 = 4.  (4/4)*40 - 20 = +20)
-            score = ((self.simulator.num_cars - car.position) / (self.simulator.num_cars - 1)) * 40.0 - 20.0
-            reward += score
+            if car.pit_count == 0:
+                reward -= 100.0 # FIA Disqualification penalty for not pitting
+            else:
+                # Reward formula: P1 gets +20, P5 gets -20
+                # (assuming 5 cars: 5 - 1 = 4.  (4/4)*40 - 20 = +20)
+                score = ((self.simulator.num_cars - car.position) / (self.simulator.num_cars - 1)) * 40.0 - 20.0
+                reward += score
             
         return float(reward)
         

@@ -1,7 +1,7 @@
 # F1 Race Strategy Predictor - Configuration
 
 data:
-  circuit: "Silverstone"
+  circuit: "Monaco"
   seasons:
     - 2022
     - 2023
@@ -9,15 +9,15 @@ data:
 
 simulation:
   num_cars: 5
-  total_laps: 52
+  total_laps: 78
   fuel_effect: 0.05       # Lap time penalty (seconds) per kg of fuel
   traffic_effect: 0.2     # Lap time penalty when closely following another car
   pit_loss_stationary: 2.5 # Stationary time in seconds
-  pit_loss_transit: 20.0   # Pit lane transit time in seconds
+  pit_loss_transit: 23.0   # Pit lane transit time in seconds
 
 safety_car:
   enabled: true
-  probability_per_lap: 0.10
+  probability_per_lap: 0.20
   min_duration: 3
   max_duration: 5
 

@@ -49,7 +49,7 @@ export PYTHONPATH="."        # Mac/Linux
 Want to train your own AI race strategist? Run these scripts one by one:
 ```bash
 # 1. Download real F1 data and learn how tires degrade
-python scripts/fetch_data.py
+python scripts/download_data.py
 python scripts/fit_degradation.py
 
 # 2. Put the AI in the simulator and let it learn by trial and error!
