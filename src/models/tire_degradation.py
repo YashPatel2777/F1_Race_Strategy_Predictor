@@ -76,12 +76,12 @@ class TireDegradationModel:
             y = group['degradation_delta'].values
             
             # DESIGN DECISION: Model Selection
-            # Decision: Compare multiple polynomial degrees against linear regression.
-            # Reason: Tire degradation is non-linear (the "cliff" effect).
+            # Decision: Restrict to Linear or simple Poly(2) to prevent severe non-monotonic curves
+            # Reason: 3rd-degree polynomials can cause the degradation curve to dip downwards, 
+            # making 20-lap old tires theoretically "faster" than 1-lap old tires in the simulator.
             models_to_test = {
                 'Linear': LinearRegression(),
                 'Polynomial_d2': make_pipeline(PolynomialFeatures(2), LinearRegression()),
-                'Polynomial_d3': make_pipeline(PolynomialFeatures(3), LinearRegression()),
             }
             
             best_model_name = None
