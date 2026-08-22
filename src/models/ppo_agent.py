@@ -84,7 +84,7 @@ class F1PPOAgent:
         self.model.learn(
             total_timesteps=total_timesteps, 
             callback=checkpoint_callback,
-            progress_bar=True # Provides a nice TQDM progress bar in console
+            progress_bar=False 
         )
         
         # Save final model state
