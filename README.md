@@ -1,89 +1,102 @@
-# F1 Race Strategy Predictor
+# F1 Race Strategy Predictor 🏎️
 
-> **An AI-powered Formula 1 Race Strategy Prediction System using Reinforcement Learning and real F1 data.**
+A complete Reinforcement Learning pipeline that learns and predicts Formula 1 race strategies from scratch using historical `FastF1` telemetry data, Proximal Policy Optimization (PPO), and a custom multi-agent physics engine.
 
-**Status: In Development**
+## 🌟 Overview
+Unlike typical lap-time predictors, this project models an F1 race as a **Multi-Agent Reinforcement Learning (MARL) environment**. The agent must learn the delicate balance between:
+- Tire Degradation (Soft vs Medium vs Hard)
+- Pit Stop Time Penalties (~25 seconds)
+- Undercutting & Overcutting opponents
+- Opportunistic pitting during Safety Cars (SC) and Virtual Safety Cars (VSC)
+- Traffic and dirty air penalties
 
-## About
+## 🏗️ Architecture Stack
+1. **Data Ingestion**: `FastF1` API (extracts real lap times and compound choices).
+2. **Predictive Modeling**: `scikit-learn` (Polynomial Regression to isolate tire degradation pace-loss from fuel-burn effect).
+3. **Simulation**: A purely decoupled, tick-based race engine (`RaceSimulator`) handling physics, undercuts, and SC deployments.
+4. **Environment**: A custom `Gymnasium` environment wrapping the simulator.
+5. **Reinforcement Learning**: `Stable-Baselines3` (PPO) using an Ego-Agent architecture.
 
-The **F1 Race Strategy Predictor** is a Reinforcement Learning project that aims to train AI agents to make strategic decisions during an F1 race.
-
-The system will use **real historical Formula 1 data from FastF1** to model factors such as tire degradation, lap times, pit stops, and race conditions.
-
-The AI will then learn through simulated races when to pit and which tire compound to choose.
-
-## Main Goal
-
-The agent will make decisions such as:
-
-* Stay out or pit
-* Choose Soft, Medium, or Hard tires
-* React to Safety Car / VSC periods
-* Attempt undercuts or overcuts
-* Optimize overall race position
-
-The goal is to learn strategies through **Reinforcement Learning rather than manually programming fixed strategies**.
-
-## Technologies
-
-* **Python**
-* **FastF1** — F1 historical data & telemetry
-* **Gymnasium** — race simulation environment
-* **Stable-Baselines3 / PPO** — Reinforcement Learning
-* **NumPy / pandas** — data processing
-* **Scikit-learn** — statistical modeling
-* **Matplotlib** — visualization
-* **PyTorch** — ML backend
-
-## Basic Architecture
-
+## 📂 Project Structure
 ```text
-Real F1 Data (FastF1)
-        ↓
-Data Processing
-        ↓
-Tire Degradation & Lap-Time Models
-        ↓
-F1 Race Simulator
-        ↓
-RL Environment
-        ↓
-PPO Agents
-        ↓
-Race Strategy Decisions
-        ↓
-Evaluation & Visualization
+F1_Race_Strategy_Predictor/
+├── config.yaml                     # Global hyperparameters and track settings
+├── data/
+│   ├── cache/                      # FastF1 offline telemetry cache
+│   └── models/                     # Saved Scikit-Learn (.joblib) & PPO (.zip) weights
+├── outputs/
+│   └── plots/races/                # Generated Matplotlib strategy charts
+├── scripts/
+│   ├── fetch_data.py               # Downloads FastF1 telemetry
+│   ├── fit_degradation.py          # Trains ML tire degradation models
+│   ├── train_agent.py              # Executes PPO RL Training Loop
+│   ├── evaluate_agent.py           # Evaluates PPO vs Baselines (100 races)
+│   ├── visualize_race.py           # Generates Gap-to-Leader graphics
+│   └── demo.py                     # Interactive Lap-by-Lap terminal commentary
+├── src/
+│   ├── data_pipeline/              # Data downloading and cleaning
+│   ├── models/                     # ML Degradation, LapTimeModel, Baselines, PPO Wrapper
+│   └── environment/                # RaceSimulator, RaceState, Gym Env
+└── tests/                          # 28 Pytest suites covering physics & ML integrity
 ```
 
-## What I Want to Build
+## 🚀 Setup & Installation
+Requires Python 3.10+
+```bash
+# 1. Clone repository & create virtual environment
+python -m venv venv
 
-The final system should be able to simulate an F1 race with multiple AI-controlled cars and learn strategies based on:
+# Activate (Windows)
+.\venv\Scripts\activate
+# Activate (Mac/Linux)
+source venv/bin/activate
 
-* Tire age and degradation
-* Track position
-* Gaps to other cars
-* Pit-stop timing
-* Safety Car / VSC conditions
-* Tire compound selection
+# 2. Install dependencies
+pip install -r requirements.txt
 
-The trained agents will then be evaluated against simple rule-based strategies and historical F1 strategies.
+# 3. Setup Python Path
+# Windows
+$env:PYTHONPATH="."
+# Mac/Linux
+export PYTHONPATH="."
+```
 
-## Project Status
+## 🏁 Running the Pipeline
+You must execute the pipeline sequentially to train the AI from scratch.
+You can configure the target circuit and RL hyperparameters in `config.yaml`.
 
-Currently building the project from scratch.
+### 1. Data Mining & ML Fitting
+Extract historical data and fit the regression curves for tire degradation:
+```bash
+python scripts/fetch_data.py
+python scripts/fit_degradation.py
+```
 
-**Planned:**
+### 2. Reinforcement Learning
+Train the PPO neural network on the simulator (simulates thousands of races):
+```bash
+python scripts/train_agent.py
+```
 
-* FastF1 data pipeline
-* Tire degradation model
-* Race simulator
-* RL environment
-* PPO training
-* Strategy evaluation
-* Race visualization
+### 3. Evaluation & Visualization
+Prove the AI's dominance by pitting it against textbook F1 baseline bots:
+```bash
+python scripts/evaluate_agent.py
+python scripts/visualize_race.py
+```
 
-## Note
+### 4. Interactive Demo
+Watch a live text-commentary of the RL agent racing against the bots!
+```bash
+python scripts/demo.py
+```
 
-This is an **Educational / Research Simulation**, not an attempt to reproduce the complete physics or strategy systems used by real F1 teams.
+## 🧪 Testing
+The project is strictly verified via Test-Driven Development (TDD). To run the full suite:
+```bash
+pytest tests/ -v
+```
 
-The project focuses specifically on exploring **Reinforcement Learning for Race Strategy Optimization**.
+## ⚠️ Known Behaviors (Reward Hacking)
+If you evaluate the AI without explicitly writing a rule that strictly mandates pitting (the "two compounds" rule), the PPO agent will quickly mathematically realize that staying out on completely dead tires for 52 laps is technically faster than wasting 25 seconds in the pit lane. 
+This is a feature of Reinforcement Learning, not a bug! The agent optimally solved the environment precisely as it was coded. To fix this, you can easily add a heavy negative reward penalty in `src/environment/f1_strategy_env.py` for agents that fail to pit.
