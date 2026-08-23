@@ -64,8 +64,8 @@ def animate_fastest_lap(circuit, year, driver, telemetry, circuit_info=None):
     out_path = os.path.join('outputs', 'animations', f'{circuit}_{year}_{driver}_lap.mp4')
     
     try:
-        # Save using FFmpeg at 30 FPS
-        ani.save(out_path, writer='ffmpeg', fps=30, dpi=150)
+        # Save using FFmpeg at 30 FPS with GPU acceleration
+        ani.save(out_path, writer='ffmpeg', fps=30, dpi=150, extra_args=['-c:v', 'h264_nvenc'])
         logger.info(f"Animation saved to {out_path}")
     except Exception as e:
         logger.error(f"FFmpeg failed to save animation. Ensure ffmpeg is installed on your system. Error: {e}")

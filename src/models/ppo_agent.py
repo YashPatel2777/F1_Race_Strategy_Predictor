@@ -60,7 +60,8 @@ class F1PPOAgent:
             clip_range=self.train_config.get('clip_range', 0.2),
             ent_coef=self.train_config.get('ent_coef', 0.0),
             tensorboard_log=tensorboard_log,
-            verbose=1
+            verbose=1,
+            device='cuda'
         )
         return self.model
 
