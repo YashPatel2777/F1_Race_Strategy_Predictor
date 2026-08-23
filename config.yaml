@@ -35,3 +35,8 @@ training:
   gamma: 0.99
   gae_lambda: 0.95
   clip_range: 0.2
+
+telemetry:
+  session_type: "Q"       # Can be 'R', 'Q', 'FP1', 'FP2', 'FP3', 'S', 'SQ'
+  distance_interpolation_step: 5.0  # Interpolate every 5 meters for fair comparison
+  plot_theme: "dark_background"
