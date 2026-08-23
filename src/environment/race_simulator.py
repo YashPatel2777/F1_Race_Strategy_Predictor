@@ -17,7 +17,18 @@ class RaceSimulator:
             self.config = yaml.safe_load(f)
             
         self.num_cars = self.config['simulation']['num_cars']
-        self.total_laps = self.config['simulation']['total_laps']
+        
+        # Dynamically fetch total laps using FastF1 Cache
+        try:
+            # pyrefly: ignore [missing-import]
+            import fastf1
+            fastf1.Cache.enable_cache('cache/fastf1')
+            session = fastf1.get_session(2024, circuit, 'R')
+            session.load(telemetry=False, weather=False, messages=False, livedata=None)
+            self.total_laps = session.total_laps
+        except Exception as e:
+            logger.warning(f"Failed to fetch total laps from FastF1 for {circuit}: {e}. Falling back to config.")
+            self.total_laps = self.config['simulation']['total_laps']
         
         self.sc_prob = self.config['safety_car']['probability_per_lap']
         self.sc_min = self.config['safety_car']['min_duration']
