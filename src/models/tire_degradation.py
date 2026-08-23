@@ -114,9 +114,10 @@ class TireDegradationModel:
             
             # Plot the fitted degradation curve vs actuals
             self._plot_degradation(circuit, compound, X, y, best_model, best_model_name)
-            
-            # Save the trained model artifact
-            model_path = os.path.join('data', 'models', f'deg_{circuit}_{compound}.joblib')
+            # Save the trained model artifact using the Config circuit name, NOT the DataFrame circuit name
+            # (FastF1 uses "Yas Island" for Abu Dhabi, which breaks the loader)
+            config_circuit = self.config['data']['circuit']
+            model_path = os.path.join('data', 'models', f'deg_{config_circuit}_{compound}.joblib')
             os.makedirs(os.path.dirname(model_path), exist_ok=True)
             joblib.dump(best_model, model_path)
             
