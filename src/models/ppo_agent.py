@@ -61,7 +61,7 @@ class F1PPOAgent:
             ent_coef=self.train_config.get('ent_coef', 0.0),
             tensorboard_log=tensorboard_log,
             verbose=1,
-            device='cuda'
+            device='auto'
         )
         return self.model
 

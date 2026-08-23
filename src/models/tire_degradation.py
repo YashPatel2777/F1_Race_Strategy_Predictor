@@ -117,9 +117,11 @@ class TireDegradationModel:
             
             # Save the trained model artifact
             model_path = os.path.join('data', 'models', f'deg_{circuit}_{compound}.joblib')
+            os.makedirs(os.path.dirname(model_path), exist_ok=True)
             joblib.dump(best_model, model_path)
             
         results_df = pd.DataFrame(results)
+        os.makedirs(os.path.join('outputs', 'reports'), exist_ok=True)
         results_df.to_csv(os.path.join('outputs', 'reports', 'degradation_metrics.csv'), index=False)
         return results_df
 
@@ -143,5 +145,6 @@ class TireDegradationModel:
         plt.grid(True, alpha=0.3)
         
         out_path = os.path.join('outputs', 'plots', 'degradation', f'{circuit}_{compound}.png')
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
         plt.savefig(out_path)
         plt.close()
