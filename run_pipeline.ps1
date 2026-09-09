@@ -1,6 +1,4 @@
-Write-Host "======================================================"
-Write-Host "      🏁 F1 PIPELINE MASTER EXECUTION SCRIPT 🏁       "
-Write-Host "======================================================"
+Write-Host "F1 PIPELINE MASTER EXECUTION SCRIPT"
 
 $env:PYTHONPATH="."
 
@@ -39,4 +37,8 @@ Write-Host "`n[9/9] Generating Fastest Lap Animation..."
 python scripts\animate_lap.py
 if ($LASTEXITCODE -ne 0) { Write-Host "Error in Step 9"; exit 1 }
 
-Write-Host "`n✅ Pipeline completed successfully!"
+Write-Host "`n[10/10] Fetching Top 10 Drivers..."
+python scripts\top_10_drivers.py
+if ($LASTEXITCODE -ne 0) { Write-Host "Error in Step 10"; exit 1 }
+
+Write-Host "`nPipeline completed successfully!"

@@ -16,17 +16,39 @@ class LapTimeModel:
         with open(config_path, 'r') as f:
             self.config = yaml.safe_load(f)
             
+        # Load Track Database
+        track_db_path = "track_database.yaml"
+        if os.path.exists(track_db_path):
+            with open(track_db_path, 'r') as f:
+                track_db = yaml.safe_load(f)
+        else:
+            track_db = {'tracks': {}}
+            
+        track_params = track_db.get('tracks', {}).get(circuit, track_db.get('tracks', {}).get('Default', {
+            'total_laps': 50,
+            'fuel_effect': 0.045,
+            'traffic_effect': 0.2,
+            'pit_loss_stationary': 2.5,
+            'pit_loss_transit': 22.0,
+            'safety_car_prob': 0.05,
+            'safety_car_min': 3,
+            'safety_car_max': 5,
+            'vsc_prob': 0.05,
+            'vsc_min': 2,
+            'vsc_max': 4
+        }))
+            
         # --- SIMULATION ASSUMPTIONS ---
         # F1 telemetry for exact fuel weight and dirty air is not public. 
         # We must use accepted motorsport approximations.
-        self.fuel_effect = self.config['simulation']['fuel_effect']
-        self.traffic_effect = self.config['simulation']['traffic_effect']
+        self.fuel_effect = track_params['fuel_effect']
+        self.traffic_effect = track_params['traffic_effect']
         
         # --- REAL DATA / ESTIMATES ---
         # We can extract average pit lane transit times from historical data, but for now
         # we configure them based on known averages for this circuit.
-        self.pit_loss_stationary = self.config['simulation'].get('pit_loss_stationary', 2.5)
-        self.pit_loss_transit = self.config['simulation'].get('pit_loss_transit', 20.0)
+        self.pit_loss_stationary = track_params['pit_loss_stationary']
+        self.pit_loss_transit = track_params['pit_loss_transit']
         
         # --- SIMULATION ASSUMPTIONS ---
         # Base pace of the track (e.g. 90.0s for a 1:30.000 lap on Softs, 0 fuel).

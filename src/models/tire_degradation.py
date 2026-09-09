@@ -19,8 +19,20 @@ class TireDegradationModel:
         with open(config_path, 'r') as f:
             self.config = yaml.safe_load(f)
         
+        circuit = self.config['data']['circuit']
+        track_db_path = "track_database.yaml"
+        if os.path.exists(track_db_path):
+            with open(track_db_path, 'r') as f:
+                track_db = yaml.safe_load(f)
+        else:
+            track_db = {'tracks': {}}
+            
+        track_params = track_db.get('tracks', {}).get(circuit, track_db.get('tracks', {}).get('Default', {
+            'fuel_effect': 0.045
+        }))
+        
         # SIMULATION ASSUMPTION: Linear fuel effect per lap
-        self.fuel_effect = self.config['simulation']['fuel_effect'] 
+        self.fuel_effect = track_params['fuel_effect']
         self.models = {}  
         
     def _normalize_lap_times(self, df: pd.DataFrame) -> pd.DataFrame:

@@ -1,9 +1,13 @@
+import os
 import yaml
 import random
 from typing import Dict, Optional
 from src.environment.race_state import RaceState, CarState
 from src.models.lap_time_model import LapTimeModel
 import logging
+import os
+# pyrefly: ignore [missing-import]
+import fastf1
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +22,28 @@ class RaceSimulator:
             
         self.num_cars = self.config['simulation']['num_cars']
         
+        # Load Track Database
+        track_db_path = "track_database.yaml"
+        if os.path.exists(track_db_path):
+            with open(track_db_path, 'r') as f:
+                track_db = yaml.safe_load(f)
+        else:
+            track_db = {'tracks': {}}
+            
+        track_params = track_db.get('tracks', {}).get(circuit, track_db.get('tracks', {}).get('Default', {
+            'total_laps': 50,
+            'fuel_effect': 0.045,
+            'traffic_effect': 0.2,
+            'pit_loss_stationary': 2.5,
+            'pit_loss_transit': 22.0,
+            'safety_car_prob': 0.05,
+            'safety_car_min': 3,
+            'safety_car_max': 5,
+            'vsc_prob': 0.05,
+            'vsc_min': 2,
+            'vsc_max': 4
+        }))
+        
         # Dynamically fetch total laps using FastF1 Cache
         try:
             # pyrefly: ignore [missing-import]
@@ -27,16 +53,16 @@ class RaceSimulator:
             session.load(telemetry=False, weather=False, messages=False, livedata=None)
             self.total_laps = session.total_laps
         except Exception as e:
-            logger.warning(f"Failed to fetch total laps from FastF1 for {circuit}: {e}. Falling back to config.")
-            self.total_laps = self.config['simulation']['total_laps']
+            logger.warning(f"Failed to fetch total laps from FastF1 for {circuit}: {e}. Falling back to track database.")
+            self.total_laps = track_params['total_laps']
         
-        self.sc_prob = self.config['safety_car']['probability_per_lap']
-        self.sc_min = self.config['safety_car']['min_duration']
-        self.sc_max = self.config['safety_car']['max_duration']
+        self.sc_prob = track_params['safety_car_prob']
+        self.sc_min = track_params['safety_car_min']
+        self.sc_max = track_params['safety_car_max']
         
-        self.vsc_prob = self.config['vsc']['probability_per_lap']
-        self.vsc_min = self.config['vsc']['min_duration']
-        self.vsc_max = self.config['vsc']['max_duration']
+        self.vsc_prob = track_params['vsc_prob']
+        self.vsc_min = track_params['vsc_min']
+        self.vsc_max = track_params['vsc_max']
         
         self.lap_model = LapTimeModel(circuit=circuit, config_path=config_path)
         

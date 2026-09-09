@@ -101,38 +101,65 @@ def main():
         'HARD': '#FFFFFF'    # White
     }
     
+    # Unique line styles for each agent so they can be differentiated
+    linestyles = ['-', '--', '-.', ':', (0, (3, 1, 1, 1))]
+    agent_linestyles = {}
+    style_idx = 0
+    
     for agent_id, (name, _) in policies.items():
         if agent_id not in telemetry:
             continue
             
+        # Assign a linestyle to this agent
+        if name not in agent_linestyles:
+            agent_linestyles[name] = linestyles[style_idx % len(linestyles)]
+            style_idx += 1
+        current_linestyle = agent_linestyles[name]
+            
         agent_telem = telemetry[agent_id]
-        x_laps = []
-        y_gaps = []
-        colors = []
+        
+        # Group into stints to draw continuous lines with proper linestyles
+        stints = []
+        current_stint = {'laps': [], 'gaps': [], 'compound': agent_telem[laps[0]]['compound']}
+        
         pit_laps = []
         pit_gaps = []
         
         for l in laps:
             data = agent_telem[l]
             gap = data['race_time'] - leader_times[l]
-            x_laps.append(l)
-            y_gaps.append(gap)
-            colors.append(compound_colors.get(data['compound'], 'gray'))
             
             if data['is_pit']:
                 pit_laps.append(l)
                 pit_gaps.append(gap)
                 
-        # Draw multi-colored line segments for stints
-        for i in range(len(x_laps)-1):
-            ax.plot(x_laps[i:i+2], y_gaps[i:i+2], color=colors[i], linewidth=2.5, solid_capstyle='round')
+            if data['compound'] != current_stint['compound']:
+                # Compound changed, save previous stint and start a new one
+                current_stint['laps'].append(l)
+                current_stint['gaps'].append(gap)
+                stints.append(current_stint)
+                current_stint = {'laps': [l], 'gaps': [gap], 'compound': data['compound']}
+            else:
+                current_stint['laps'].append(l)
+                current_stint['gaps'].append(gap)
+                
+        stints.append(current_stint)
+                
+        # Draw each stint
+        for stint in stints:
+            color = compound_colors.get(stint['compound'], 'gray')
+            ax.plot(stint['laps'], stint['gaps'], color=color, linestyle=current_linestyle, linewidth=2.5)
             
-        # Hidden plot just to populate the legend with the agent name
-        ax.plot([], [], color='gray', label=name, linewidth=2)
+        # Hidden plot just to populate the legend with the agent name and its specific linestyle
+        ax.plot([], [], color='gray', linestyle=current_linestyle, label=name, linewidth=2.5)
         
         # Pit stop markers (Cyan 'X')
         if pit_laps:
             ax.scatter(pit_laps, pit_gaps, color='#00FFFF', marker='X', s=150, zorder=5, label=f'Pit ({name})')
+            
+    # Add a custom legend entry for Tire Compounds so the user knows what the colors mean
+    for compound, color in compound_colors.items():
+        ax.plot([], [], color=color, linewidth=4, label=f'Tire: {compound}')
             
     # In F1 gap charts, Leader is at Y=0 (Top), cars behind drop downwards (Y increases)
     ax.invert_yaxis() 
