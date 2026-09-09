@@ -25,8 +25,10 @@ def print_top_10():
         for i, (_, row) in enumerate(q_top.iterrows(), 1):
             print(f"{i:<5} | {row['FullName']:<25} | {row['TeamName']:<25}")
             
-        print("===============================================================\n")
-            
+        print("\n")
+        print("-" * 67)
+        print("\n")
+
         # Fetch Race
         r_session = fastf1.get_session(latest_season, circuit, 'R')
         r_session.load(telemetry=False, weather=False, messages=False, livedata=None)
